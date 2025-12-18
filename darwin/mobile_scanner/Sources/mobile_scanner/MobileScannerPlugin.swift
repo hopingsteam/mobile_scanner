@@ -790,6 +790,10 @@ public class MobileScannerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
             try device.lockForConfiguration()
             device.torchMode = newTorchMode
             device.unlockForConfiguration()
+
+            // Explicitly emit the new torch state
+            let event: [String: Any?] = ["name": "torchState", "data": newTorchMode.rawValue]
+            sink?(event)
         } catch(_) {
             // Do nothing.
         }

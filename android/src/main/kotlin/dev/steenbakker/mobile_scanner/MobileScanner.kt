@@ -85,6 +85,7 @@ class MobileScanner(
     private var detectionTimeout: Long = 250
     private var returnImage = false
     private var isPaused = false
+    private var torchStateCallback: TorchStateCallback? = null
 
     companion object {
         // Configure the `ProcessCameraProvider` to only log errors.
@@ -367,6 +368,7 @@ class MobileScanner(
         this.detectionTimeout = detectionTimeout
         this.returnImage = returnImage
         this.invertImage = invertImage
+        this.torchStateCallback = torchStateCallback
 
         if (camera?.cameraInfo != null && preview != null && surfaceProducer != null && !isPaused) {
 
@@ -617,6 +619,7 @@ class MobileScanner(
         scanner?.close()
         scanner = null
         lastScanned = null
+        torchStateCallback = null
 
         // Shutdown the analysis executor
         analysisExecutor.shutdown()
@@ -635,10 +638,20 @@ class MobileScanner(
                 return@let
             }
 
-            when(it.cameraInfo.torchState.value) {
-                TorchState.OFF -> it.cameraControl.enableTorch(true)
-                TorchState.ON -> it.cameraControl.enableTorch(false)
+            val newState: Int = when(it.cameraInfo.torchState.value) {
+                TorchState.OFF -> {
+                    it.cameraControl.enableTorch(true)
+                    TorchState.ON
+                }
+                TorchState.ON -> {
+                    it.cameraControl.enableTorch(false)
+                    TorchState.OFF
+                }
+                else -> return@let
             }
+
+            // Explicitly emit the new torch state
+            torchStateCallback?.invoke(newState)
         }
     }
 

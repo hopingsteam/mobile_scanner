@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mobile_scanner_example/screens/mobile_scanner_advanced.dart';
+import 'package:mobile_scanner_example/screens/torch_state_test_screen.dart';
 
 void main() {
   runApp(
@@ -166,6 +167,14 @@ class _ExampleHome extends StatelessWidget {
                     'controller, and multiple control widgets.',
                 const MobileScannerAdvanced(),
                 Icons.settings_remote,
+              ),
+              _buildItem(
+                context,
+                'Torch State Stream Test',
+                'Test to verify torch state stream events are emitted '
+                    'when toggling the torch.',
+                const TorchStateTestScreen(),
+                Icons.bug_report,
               ),
               // TODO(juliansteenbakker): Fix picklist example
               // _buildItem(
